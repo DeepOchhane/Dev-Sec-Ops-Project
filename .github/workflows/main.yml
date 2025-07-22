@@ -1,0 +1,30 @@
+name: Build with Docker-compose
+
+on:
+  push:
+    branches:
+     - main
+  workflow_dispatch:
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
+     - name: checkout code
+       uses: actions/checkout@v4
+       
+     - name: set up Docker
+       uses: docker/setup-buildx-action@v3
+
+     - name: Build and Start containers via docker-compose
+       run: |
+         docker-compose up --build -d
+
+     - name: Show running containers
+       run: docker ps
+
+     - name: Stop and Remove containers
+       if: always()
+       run: |
+          docker-compose down     
+       
+    
