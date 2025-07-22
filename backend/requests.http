@@ -1,0 +1,8 @@
+GET http://localhost:8000/api/list
+
+POST http://localhost:8000/api/new 
+Content-Type: application/json
+
+{
+  "email": "example@domain.com"
+}

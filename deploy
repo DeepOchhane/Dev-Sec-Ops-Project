@@ -1,0 +1,13 @@
+#!/bin/bash
+minikube start
+kubectl create namespace fullstack-app
+kubectl apply -f deployment/pv.yaml
+kubectl apply -f deployment/pvc.yaml
+kubectl apply -f deployment/secrets.yaml
+kubectl apply -f deployment/configmap.yaml
+kubectl apply -f deployment/db-deployment.yaml
+sudo apt update;
+kubectl apply -f deployment/backend-deployment.yaml
+sudo apt install socat -y;
+kubectl apply -f deployment/frontend-deployment.yaml
+socat TCP4-LISTEN:8000,fork TCP4:192.168.49.2:30000

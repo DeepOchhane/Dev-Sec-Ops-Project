@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "Vue.volar",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "ms-azuretools.vscode-docker",
+    "esbenp.prettier-vscode"
+  ]
+}

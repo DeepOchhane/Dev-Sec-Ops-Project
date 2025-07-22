@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Install minikube
+if command -v minikube &> /dev/null
+then
+    echo "Minikube is installed"
+else
+    echo "Minikube is not installed. Installing...."
+    curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
+fi
+
+# Install mongosh
+if command -v mongosh &> /dev/null
+then
+    echo "mongosh is installed."
+else
+    wget https://downloads.mongodb.com/compass/mongodb-mongosh_2.2.15_amd64.deb
+    sudo dpkg -i mongodb-mongosh_2.2.15_amd64.deb
+    rm mongodb-mongosh_2.2.15_amd64.deb
+    echo "mongosh installed successfully!"
+fi
