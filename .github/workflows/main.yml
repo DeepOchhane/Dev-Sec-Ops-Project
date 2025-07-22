@@ -26,6 +26,5 @@ jobs:
      - name: Stop and Remove containers
        if: always()
        run: |
-          docker-compose down     
-       
+          docker compose down
     
