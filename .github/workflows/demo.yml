@@ -72,10 +72,10 @@ jobs:
         chmod 600 private_key.pem
 
 # Step 6: Optional wait for SSH to be ready
-    - name: Wait for SSH to be ready
-      run: |
-        echo "Waiting 30 seconds for EC2 to be ready..."
-        sleep 30
+    # - name: Wait for SSH to be ready
+    #   run: |
+    #     echo "Waiting 30 seconds for EC2 to be ready..."
+    #     sleep 30
 
 # Step 7: SSH and install tools
     - name: SSH into EC2 and install packages
