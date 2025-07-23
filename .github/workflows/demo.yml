@@ -20,3 +20,25 @@ jobs:
 
      - name: Test AWS CLI
        run: aws sts get-caller-identity
+
+  create-ec2-instance:
+    runs-on: ubuntu-latest
+    needs: deploy
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Launch EC2 Instance
+        run: |
+          aws ec2 run-instances \
+            --image-id ami-03bb6d83c60fc5f7c \  # ✅ Mumbai Ubuntu AMI (20.04 LTS)
+            --instance-type t2.micro \
+            --key-name my-keypair \  # 👈 Replace with your existing key pair name
+            --security-groups default \
+            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=GitHub-Runner-Instance}]'
+
