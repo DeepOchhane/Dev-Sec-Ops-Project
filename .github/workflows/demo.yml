@@ -36,9 +36,10 @@ jobs:
       - name: Launch EC2 Instance
         run: |
           aws ec2 run-instances \
-            --image-id ami-03bb6d83c60fc5f7c \  # ✅ Mumbai Ubuntu AMI (20.04 LTS)
+            --image-id ami-00e3c023f0084cbfb \
             --instance-type t2.micro \
-            --key-name my-keypair \  # 👈 Replace with your existing key pair name
-            --security-groups default \
-            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=GitHub-Runner-Instance}]'
-
+            --key-name AWS-Jenkins \
+            --security-group-ids sg-070c369ac59b7efa0 \
+            --count 1 \
+            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=MyInstance}]'
+            
