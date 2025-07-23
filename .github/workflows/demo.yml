@@ -16,7 +16,7 @@ jobs:
        with:
          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-         aws-region: ap-south-1  # Or use ${{ secrets.AWS_REGION }} if you stored it as a secret
+         aws-region: ap-south-1 
 
      - name: Test AWS CLI
        run: aws sts get-caller-identity
@@ -26,20 +26,59 @@ jobs:
     needs: deploy
 
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
+    # Step 1: Configure AWS Credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-south-1
 
-      - name: Launch EC2 Instance
-        run: |
-          aws ec2 run-instances \
-            --image-id ami-0b32d400456908bf9 \
-            --instance-type t2.micro \
-            --key-name AWS-Jenkins \
-            --security-group-ids sg-070c369ac59b7efa0 \
-            --count 1 \
-            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=MyInstance}]'
-            
+# Step 2: Launch EC2 Instance
+    - name: Launch EC2 Instance
+      id: ec2
+      run: |
+        INSTANCE_ID=$(aws ec2 run-instances \
+          --image-id ami-0b32d400456908bf9 \  # ✅ Replace with your AMI ID for Amazon Linux
+          --instance-type t2.micro \
+          --key-name AWS-Jenkins \            # ✅ Replace with your EC2 Key Pair name
+          --security-group-ids sg-070c369ac59b7efa0 \  # ✅ Replace with your SG ID (must allow SSH)
+          --count 1 \
+          --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=MyInstance}]' \
+          --query 'Instances[0].InstanceId' \
+          --output text)
+
+        echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
+
+# Step 3: Wait for EC2 to be in 'running' state
+    - name: Wait for instance to be running
+      run: |
+        aws ec2 wait instance-running --instance-ids ${{ env.INSTANCE_ID }}
+
+# Step 4: Fetch Public IP of the instance
+    - name: Get public IP
+      run: |
+        PUBLIC_IP=$(aws ec2 describe-instances \
+          --instance-ids ${{ env.INSTANCE_ID }} \
+          --query "Reservations[0].Instances[0].PublicIpAddress" \
+          --output text)
+        echo "PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
+
+# Step 5: Add your EC2 private key (added to GitHub Secrets as EC2_PRIVATE_KEY)
+    - name: Add SSH key
+      run: |
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
+        chmod 600 private_key.pem
+
+# Step 6: SSH and install Java, Maven, Git on Amazon Linux
+    - name: SSH into EC2 and install packages
+      run: |
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ env.PUBLIC_IP }} << 'EOF'
+          sudo yum update -y
+          sudo amazon-linux-extras enable corretto8
+          sudo yum install -y java-1.8.0-amazon-corretto git maven
+          java -version
+          mvn -version
+          git --version
+        EOF
+
