@@ -36,7 +36,7 @@ jobs:
       - name: Launch EC2 Instance
         run: |
           aws ec2 run-instances \
-            --image-id ami-00e3c023f0084cbfb \
+            --image-id ami-0b32d400456908bf9 \
             --instance-type t2.micro \
             --key-name AWS-Jenkins \
             --security-group-ids sg-070c369ac59b7efa0 \
