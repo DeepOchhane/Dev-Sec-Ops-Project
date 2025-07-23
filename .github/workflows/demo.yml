@@ -67,7 +67,7 @@ jobs:
 # Step 5: Add your EC2 private key (added to GitHub Secrets as EC2_PRIVATE_KEY)
     - name: Add SSH key
       run: |
-        echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
+        cat "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
         chmod 600 private_key.pem
 
 # Step 6: SSH and install Java, Maven, Git on Amazon Linux
