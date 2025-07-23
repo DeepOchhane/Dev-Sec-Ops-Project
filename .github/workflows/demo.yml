@@ -39,10 +39,10 @@ jobs:
       id: ec2
       run: |
         INSTANCE_ID=$(aws ec2 run-instances \
-          --image-id ami-0b32d400456908bf9 \  # ✅ Replace with your AMI ID for Amazon Linux
+          --image-id ami-0b32d400456908bf9 \
           --instance-type t2.micro \
-          --key-name AWS-Jenkins \            # ✅ Replace with your EC2 Key Pair name
-          --security-group-ids sg-070c369ac59b7efa0 \  # ✅ Replace with your SG ID (must allow SSH)
+          --key-name AWS-Jenkins.pem \
+          --security-group-ids sg-0e3d8350436ee8228 \
           --count 1 \
           --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=MyInstance}]' \
           --query 'Instances[0].InstanceId' \
@@ -81,4 +81,5 @@ jobs:
           mvn -version
           git --version
         EOF
+
 
