@@ -41,8 +41,8 @@ jobs:
         INSTANCE_ID=$(aws ec2 run-instances \
           --image-id ami-0b32d400456908bf9 \
           --instance-type t2.micro \
-          --key-name AWS-Jenkins \
-          --security-group-ids sg-0e3d8350436ee8228 \
+          --key-name Git-hub-test \
+          --security-group-ids sg-08b9bc5c1f8e14ed4 \
           --count 1 \
           --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=MyInstance}]' \
           --query 'Instances[0].InstanceId' \
@@ -67,9 +67,8 @@ jobs:
 # Step 5: Add your EC2 private key (added to GitHub Secrets as EC2_PRIVATE_KEY)
     - name: Add SSH key
       run: |
-        echo "${{ secrets.EC2_PRIVATE_KEY }}"
-        echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
-        cat private_key.pem
+        echo "Saving EC2 private key to file..."
+        printf "%s\n" "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
         chmod 600 private_key.pem
 
 # Step 6: SSH and install Java, Maven, Git on Amazon Linux
