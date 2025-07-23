@@ -64,14 +64,20 @@ jobs:
           --output text)
         echo "PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
 
-# Step 5: Add your EC2 private key (added to GitHub Secrets as EC2_PRIVATE_KEY)
+# Step 5: Save EC2 Private Key securely
     - name: Add SSH key
       run: |
-        echo "Saving EC2 private key to file..."
+        echo "Saving EC2 private key..."
         printf "%s\n" "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
         chmod 600 private_key.pem
 
-# Step 6: SSH and install Java, Maven, Git on Amazon Linux
+# Step 6: Optional wait for SSH to be ready
+    - name: Wait for SSH to be ready
+      run: |
+        echo "Waiting 30 seconds for EC2 to be ready..."
+        sleep 30
+
+# Step 7: SSH and install tools
     - name: SSH into EC2 and install packages
       run: |
         ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ env.PUBLIC_IP }} << 'EOF'
@@ -82,5 +88,3 @@ jobs:
           mvn -version
           git --version
         EOF
-
-
