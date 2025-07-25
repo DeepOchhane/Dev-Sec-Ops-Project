@@ -20,8 +20,8 @@ jobs:
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
-      - name: Scan docker-compose.yml for misconfigurations
-        run: trivy config docker-compose.yml
+      - name: Scan docker-compose.yaml for misconfigurations
+        run: trivy config docker-compose.yaml
 
       - name: Build and Start containers via docker-compose
         run: |
