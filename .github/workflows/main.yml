@@ -1,41 +1,77 @@
-name: Build with Docker-compose
+name: Secure CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [ main ]
+  pull_request:
 
 jobs:
-  build-and-run:
+  secure-pipeline:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-      - name: Install Trivy
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+    # 🛡️ Trivy config scan on docker-compose.yaml
+    - name: Scan docker-compose.yaml for misconfigurations
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: config
+        scan-ref: ./docker-compose.yaml
+        format: table
+        exit-code: 1
+        severity: CRITICAL,HIGH
 
-      - name: Scan docker-compose.yaml for misconfigurations
-        run: trivy config docker-compose.yaml
+    # 🐳 Dockerfile Scan (use Dockle for Dockerfile-specific issues)
+    - name: Scan Dockerfile with Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: config
+        scan-ref: ./backend/Dockerfile
+        format: table
+        exit-code: 1
+        severity: CRITICAL,HIGH
 
-      - name: Build and Start containers via docker-compose
-        run: |
-          docker compose up --build -d
+    - name: Create .env for backend
+      run: echo "MONGO_URI=${{ secrets.MONGO_URI }}" > ./backend/.env
 
-      - name: Show running containers
-        run: docker ps
+    # 🧱 Build all containers
+    - name: Build and Start containers
+      run: docker compose up --build -d
 
-      - name: Scan backend and frontend images with Trivy
-        run: |
-          trivy image newsletter-webapp-backend:latest
-          trivy image newsletter-webapp-frontend:latest  
+    # 🛡️ Trivy scan for backend image
+    - name: Scan Backend Image
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: newsletter-webapp-backend:latest
+        format: table
+        exit-code: 1
+        severity: CRITICAL,HIGH
+        ignore-unfixed: true
 
-      - name: Stop and Remove containers
-        if: always()
-        run: |
-          docker compose down
+    # 🛡️ Trivy scan for frontend image
+    - name: Scan Frontend Image
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: newsletter-webapp-frontend:latest
+        format: table
+        exit-code: 1
+        severity: CRITICAL,HIGH
+        ignore-unfixed: true
+
+    # (Optional) Scan Mongo official image
+    - name: Scan Mongo Image
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: mongo:latest
+        format: table
+        exit-code: 0 # Don't fail on official image
+
+    # 🔻 Shut down containers
+    - name: Stop containers
+      if: always()
+      run: docker compose down
