@@ -30,11 +30,10 @@ jobs:
       - name: Show running containers
         run: docker ps
 
-      - name: Scan built image with Trivy
+      - name: Scan backend and frontend images with Trivy
         run: |
-          docker compose images
-          # Replace with your actual image name, like `myapp_web`
-          trivy image your-image-name
+          trivy image newsletter-webapp-backend:latest
+          trivy image newsletter-webapp-frontend:latest  
 
       # - name: Stop and Remove containers
       #   if: always()
