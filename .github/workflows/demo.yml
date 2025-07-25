@@ -87,16 +87,9 @@ jobs:
           echo "Verifying Trivy installation..."
           trivy --version
         EOF
-# Step 8: Upload Dockerfile to EC2 instance
-    - name: Copy Dockerfile to EC2 instance
+# Step 8: Stop and Terminate EC2 Instance
+    - name: Terminate EC2 Instance
       run: |
-        scp -o StrictHostKeyChecking=no -i private_key.pem Dockerfile ec2-user@${{ env.PUBLIC_IP }}:/home/ec2-user/
-
-# Step 9: Run Trivy scan on the Dockerfile
-    - name: Run Trivy scan on Dockerfile
-      run: |
-        ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ env.PUBLIC_IP }} << 'EOF'
-          echo "Running Trivy scan on Dockerfile..."
-          trivy config /home/ec2-user/Dockerfile > /home/ec2-user/dockerfile-scan.txt
-          cat /home/ec2-user/dockerfile-scan.txt
-        EOF
+        echo "Stopping and terminating EC2 instance: ${{ env.INSTANCE_ID }}"
+        aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
+        aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
