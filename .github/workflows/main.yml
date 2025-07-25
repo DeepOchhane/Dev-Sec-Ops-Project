@@ -3,28 +3,40 @@ name: Build with Docker-compose
 on:
   push:
     branches:
-     - main
+      - main
   workflow_dispatch:
+
 jobs:
   build-and-run:
     runs-on: ubuntu-latest
     steps:
-     - name: checkout code
-       uses: actions/checkout@v4
-       
-     - name: set up Docker
-       uses: docker/setup-buildx-action@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-     - name: Build and Start containers via docker-compose
-       run: |
-          docker compose version
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Scan docker-compose.yml for misconfigurations
+        run: trivy config docker-compose.yml
+
+      - name: Build and Start containers via docker-compose
+        run: |
           docker compose up --build -d
 
-     - name: Show running containers
-       run: docker ps
+      - name: Show running containers
+        run: docker ps
 
-     - name: Stop and Remove containers
-       if: always()
-       run: |
+      - name: Scan built image with Trivy
+        run: |
+          docker compose images
+          # Replace with your actual image name, like `myapp_web`
+          trivy image your-image-name
+
+      - name: Stop and Remove containers
+        if: always()
+        run: |
           docker compose down
-    
