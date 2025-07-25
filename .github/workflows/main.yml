@@ -36,7 +36,7 @@ jobs:
           # Replace with your actual image name, like `myapp_web`
           trivy image your-image-name
 
-      - name: Stop and Remove containers
-        if: always()
-        run: |
-          docker compose down
+      # - name: Stop and Remove containers
+      #   if: always()
+      #   run: |
+      #     docker compose down
