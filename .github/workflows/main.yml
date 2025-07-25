@@ -16,25 +16,28 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
+    # ✅ Install Trivy CLI for config and Dockerfile scan
     - name: Install Trivy
       run: |
         curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
-    # 🛡️ Scan docker-compose.yaml
+    # 1️⃣ Trivy - Scan docker-compose.yaml for misconfigurations
     - name: Scan docker-compose.yaml
       run: trivy config ./docker-compose.yaml --severity CRITICAL,HIGH
 
-    # 🐳 Scan Dockerfile
+    # 2️⃣ Trivy - Scan Dockerfile for insecure instructions
     - name: Scan Dockerfile
       run: trivy config ./backend/Dockerfile --severity CRITICAL,HIGH
 
+    # 🔐 Setup env for backend
     - name: Create .env for backend
       run: echo "MONGO_URI=${{ secrets.MONGO_URI }}" > ./backend/.env
 
+    # 🐳 Docker Compose Build & Run
     - name: Build and Start containers
       run: docker compose up --build -d
 
-    # 🔍 Image scan backend
+    # 3️⃣ Trivy - Scan Backend Image
     - name: Scan Backend Image
       uses: aquasecurity/trivy-action@master
       with:
@@ -44,7 +47,7 @@ jobs:
         severity: CRITICAL,HIGH
         ignore-unfixed: true
 
-    # 🔍 Image scan frontend
+    # 4️⃣ Trivy - Scan Frontend Image
     - name: Scan Frontend Image
       uses: aquasecurity/trivy-action@master
       with:
@@ -54,6 +57,33 @@ jobs:
         severity: CRITICAL,HIGH
         ignore-unfixed: true
 
-    # - name: Stop containers
-    #   if: always()
-    #   run: docker compose down
+    # 🔻 Cleanup (optional)
+    - name: Stop containers
+      if: always()
+      run: docker compose down
+
+  semgrep-scan:
+    runs-on: ubuntu-latest
+    needs: secure-pipeline  # ⏳ Waits for security steps to complete
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 🐍 Python needed for Semgrep
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    # 🕵️‍♂️ Install Semgrep
+    - name: Install Semgrep
+      run: pip install semgrep
+
+    # 🔍 Run Semgrep static analysis
+    - name: Run Semgrep scan
+      run: |
+        semgrep scan \
+          --config auto \
+          --severity ERROR \
+          --error
