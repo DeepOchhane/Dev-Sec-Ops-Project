@@ -77,14 +77,13 @@ jobs:
         echo "Waiting 30 seconds for EC2 to be ready..."
         sleep 30
 
-# Step 7: SSH and install tools
+# Step 7: SSH and install trviy
     - name: SSH into EC2 and install packages
       run: |
         ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ env.PUBLIC_IP }} << 'EOF'
           sudo yum update -y
-          sudo amazon-linux-extras enable corretto8
-          sudo yum install -y java-1.8.0-amazon-corretto git maven
-          java -version
-          mvn -version
-          git --version
-        EOF
+          echo "Installing Trivy..."
+          sudo rpm -ivh https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.50.1_Linux-64bit.rpm
+          echo "Verifying Trivy installation..."
+          trivy --version
+         EOF
