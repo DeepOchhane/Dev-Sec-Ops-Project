@@ -60,3 +60,18 @@ Candidate: Deep Ochhane
     Use SBOM scanning with Trivy or CycloneDX.
 
     Enable GitHub Dependabot or npm audit CI job.
+
+    🔒 Semgrep detected default root user usage in Dockerfiles.
+Fix was intentionally not applied in this project due to runtime dependencies, but flagged for future production hardening.
+
+📌 Semgrep Security Scan Summary
+
+Tool: Semgrep
+Findings:
+
+backend/Dockerfile: no USER specified — runs as root.
+
+frontend/Dockerfile: no USER specified — runs as root.
+Impact: Running containers as root can lead to container breakout if exploited.
+Recommendation: Specify a non-root user via USER instruction in Dockerfile.
+Status: Documented. Fix is deferred in this evaluation project.
