@@ -35,7 +35,7 @@ jobs:
           trivy image newsletter-webapp-backend:latest
           trivy image newsletter-webapp-frontend:latest  
 
-      # - name: Stop and Remove containers
-      #   if: always()
-      #   run: |
-      #     docker compose down
+      - name: Stop and Remove containers
+        if: always()
+        run: |
+          docker compose down
