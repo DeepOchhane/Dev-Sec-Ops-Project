@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  secure-pipeline:
+  Trivy-Scan:
     runs-on: ubuntu-latest
 
     steps:
@@ -87,3 +87,23 @@ jobs:
           --config auto \
           --severity ERROR \
           --error
+
+  scan:
+    runs-on: ubuntu-latest
+    name: Security Scanning
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # SEMGREP SCAN (you already added)
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: "p/default"
+
+      # 🔐 GITLEAKS SCAN
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2.3.3
+        with:
+          args: --path=. --verbose --redact
