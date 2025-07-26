@@ -7,9 +7,13 @@ services:
     ports:
       - 8008:80
     networks:
-    - net
+      - net
     depends_on:
       - backend
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    restart: always
 
   backend:
     container_name: backend
@@ -24,6 +28,10 @@ services:
       - net
     depends_on:
       - db
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    restart: always
 
   db:
     container_name: mongo
@@ -33,6 +41,7 @@ services:
       - net
     volumes:
       - storage:/data/db
+    read_only: true
 
 networks:
   net:
