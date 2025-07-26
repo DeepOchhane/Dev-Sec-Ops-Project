@@ -1,3 +1,4 @@
+
 # Use a pinned LTS version for security
 FROM node:18-alpine
 
@@ -26,3 +27,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # Start the app
 CMD ["npm", "start"]
+
+# next step
