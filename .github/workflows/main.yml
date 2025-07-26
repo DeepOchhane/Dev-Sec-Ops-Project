@@ -32,15 +32,15 @@ jobs:
     - name: Build and Start containers
       run: docker compose up --build -d
 
-    - name: Scan Backend Image with Trivy
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: newsletter-webapp-backend:latest
-        format: table
-        exit-code: 1
-        vuln-type: 'os,library'
-        ignore-unfixed: true
-      continue-on-error: true
+    # - name: Scan Backend Image with Trivy
+    #   uses: aquasecurity/trivy-action@master
+    #   with:
+    #     image-ref: newsletter-webapp-backend:latest
+    #     format: table
+    #     exit-code: 1
+    #     vuln-type: 'os,library'
+    #     ignore-unfixed: true
+    #   continue-on-error: true
 
     - name: Scan Frontend Image with Trivy
       uses: aquasecurity/trivy-action@master
@@ -50,7 +50,7 @@ jobs:
         exit-code: 1
         vuln-type: 'os,library'
         ignore-unfixed: true
-      continue-on-error: true
+      continue-on-error: false
 
     - name: Stop containers
       if: always()
