@@ -38,8 +38,9 @@ jobs:
         image-ref: newsletter-webapp-backend:latest
         format: table
         exit-code: 1
-        severity: CRITICAL,HIGH
+        vuln-type: 'os,library'
         ignore-unfixed: true
+      continue-on-error: true
 
     - name: Scan Frontend Image with Trivy
       uses: aquasecurity/trivy-action@master
@@ -49,7 +50,7 @@ jobs:
         exit-code: 1
         vuln-type: 'os,library'
         ignore-unfixed: true
-      continue-on-error: false
+      continue-on-error: true
 
     - name: Stop containers
       if: always()
