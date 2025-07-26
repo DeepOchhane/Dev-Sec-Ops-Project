@@ -1,31 +1,24 @@
-
-# Use a pinned LTS version for security
 FROM node:18-alpine
 
-# Create app directory
 WORKDIR /app
 
-# Add a non-root user and switch to it
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
-# Copy only required files first to leverage caching
+# Copy dependency files first
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies as root
 RUN npm install --production
 
-# Copy the rest of the application code
+# Copy the rest of the code
 COPY . .
 
-# Expose the backend port
+# Create and switch to non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup && \
+    chown -R appuser:appgroup /app
+USER appuser
+
 EXPOSE 9000
 
-# (Optional) Add container healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget -qO- http://localhost:9000/health || exit 1
 
-# Start the app
 CMD ["npm", "start"]
-
-# next step
