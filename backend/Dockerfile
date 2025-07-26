@@ -1,29 +1,28 @@
-# Stage 1: Build
-# Use Node.js 20.15 on Alpine Linux as the base image for the build stage
-FROM node:20.15-alpine AS build
-# Set the working directory inside the container to /src
-WORKDIR /src
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
-# Install dependencies specified in the package.json
-RUN npm install
-# Copy all files to the working directory in the container
-COPY . .
-# Build the project using the npm build script
-RUN npm run build
+# Use a pinned LTS version for security
+FROM node:18-alpine
 
-# Stage 2: Deploy
-# Use Node.js 20.15 on Alpine Linux as the base image for the deployment stage
-FROM node:20.15-alpine as server
-# Set the working directory inside the container to /app
+# Create app directory
 WORKDIR /app
-# Copy package.json and package-lock.json to the working directory
+
+# Add a non-root user and switch to it
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+# Copy only required files first to leverage caching
 COPY package*.json ./
-# Install only the production dependencies, omitting the dev dependencies
-RUN npm install --omit=dev
-# Copy the built files from the build stage to the /app directory
-COPY --from=build /src/dist /app/
-# Expose port 9000 to allow HTTP traffic
+
+# Install dependencies
+RUN npm install --production
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose the backend port
 EXPOSE 9000
-# Start the Node.js application using app.js as the entry point
-CMD ["node", "app.js"]
+
+# (Optional) Add container healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:9000/health || exit 1
+
+# Start the app
+CMD ["npm", "start"]
