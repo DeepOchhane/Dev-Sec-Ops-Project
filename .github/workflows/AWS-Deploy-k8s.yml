@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  AWS-Ac-linking:
+  AWS-IAM-Configuration:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,3 +20,9 @@ jobs:
 
      - name: Test AWS CLI
        run: aws sts get-caller-identity
+
+     - name: Login to Amazon ECR
+       run: |
+         aws ecr get-login-password --region ap-south-1 | \
+         docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com
+
