@@ -1,5 +1,4 @@
 name: AWS K8S Deployment test
-
 on:
   workflow_dispatch:
 
