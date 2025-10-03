@@ -2,7 +2,14 @@ name: Auto PR Template Selection
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  actions: read
+
 
 jobs:
   auto-template:
