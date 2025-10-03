@@ -109,3 +109,9 @@ Always select the correct PR template when creating a PR.
 Ensure ClickUp task links and Acceptance Criteria are completed.
 
 This update will help us test how GitHub shows the dropdown template selection on new PRs.
+
+### Now we are ready to check out template:
+
+* it is actually working or not?
+* Let's do it.
+  
