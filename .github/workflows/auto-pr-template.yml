@@ -18,7 +18,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get changed files
+      - name: Get changed files  
         id: changed-files
         uses: tj-actions/changed-files@v40
         with:
@@ -33,22 +33,6 @@ jobs:
               - server/**
               - api/**
 
-      - name: Apply Frontend Template
-        if: steps.changed-files.outputs.frontend_any_changed == 'true'
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.PAT_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const template = fs.readFileSync('.github/PULL_REQUEST_TEMPLATE/frontend_pr.md', 'utf8');
-            
-            await github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              body: template
-            });
-
       - name: Apply Backend Template
         if: steps.changed-files.outputs.backend_any_changed == 'true'
         uses: actions/github-script@v7
@@ -56,7 +40,7 @@ jobs:
           github-token: ${{ secrets.PAT_TOKEN }}
           script: |
             const fs = require('fs');
-            const template = fs.readFileSync('.github/PULL_REQUEST_TEMPLATE/backend_pr.md', 'utf8');
+            const template = fs.readFileSync('.github/PULL_REQUEST_TEMPLATE/backend_pr_template.md', 'utf8');
             
             await github.rest.pulls.update({
               owner: context.repo.owner,
@@ -65,19 +49,35 @@ jobs:
               body: template
             });
 
-      - name: Add Template Labels
+      - name: Apply Frontend Template
+        if: steps.changed-files.outputs.frontend_any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const template = fs.readFileSync('.github/PULL_REQUEST_TEMPLATE/frontend_pr_template.md', 'utf8');
+            
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              body: template
+            });
+
+      - name: Add Labels
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
           script: |
             const labels = [];
             
-            if ('${{ steps.changed-files.outputs.frontend_any_changed }}' === 'true') {
-              labels.push('frontend');
-            }
-            
             if ('${{ steps.changed-files.outputs.backend_any_changed }}' === 'true') {
               labels.push('backend');
+            }
+            
+            if ('${{ steps.changed-files.outputs.frontend_any_changed }}' === 'true') {
+              labels.push('frontend');
             }
             
             if (labels.length > 0) {
