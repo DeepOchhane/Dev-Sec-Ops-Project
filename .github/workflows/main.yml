@@ -1,9 +1,7 @@
 name: Secure CI/CD Pipeline
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   Trivy-Scan:
