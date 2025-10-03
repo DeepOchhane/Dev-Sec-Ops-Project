@@ -34,7 +34,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const template = fs.readFileSync('.github/PULL_REQUEST_TEMPLATE/frontend_pr.md', 'utf8');
+            const template = fs.readFileSync('.github/PULL_REQUEST_TEMPLATE/frontend_pr_template.md', 'utf8');
             
             await github.rest.pulls.update({
               owner: context.repo.owner,
@@ -49,7 +49,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const template = fs.readFileSync('.github/PULL_REQUEST_TEMPLATE/backend_pr.md', 'utf8');
+            const template = fs.readFileSync('.github/PULL_REQUEST_TEMPLATE/backend_pr_template.md', 'utf8');
             
             await github.rest.pulls.update({
               owner: context.repo.owner,
