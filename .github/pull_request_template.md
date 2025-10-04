@@ -1,6 +1,24 @@
-## Choose Your PR Template
+# Pull Request
 
-Please go to the **Preview** tab and select the appropriate template:
+## Description
+<!-- Briefly describe what this PR does and why -->
 
-* [Backend Template](?expand=1&template=backend_pr_template.md)
-* [Frontend Template](?expand=1&template=frontend_pr_template.md)
+## Related Issue / Task
+<!-- Add JIRA ticket or issue link if applicable -->
+- JIRA Ticket: [ABC-123](https://your-jira-link)
+
+## Changes Introduced
+<!-- List the key changes or additions made in this PR -->
+- 
+- 
+
+## Checklist
+- [ ] Code builds locally without errors
+- [ ] Unit/integration tests pass
+- [ ] No sensitive data or credentials included
+- [ ] Documentation updated (if applicable)
+- [ ] Follows project coding guidelines
+
+## Notes for Reviewers
+<!-- Anything specific you want reviewers to focus on -->
+
