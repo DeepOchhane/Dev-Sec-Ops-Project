@@ -3,7 +3,7 @@ Dev-Sec-Ops Project
 Security Scan Report:
 
 📄 DevSecOps Vulnerability Report
-
+fff
 Tool: Trivy
 Target: newsletter-webapp-backend:latest
 Date: July 25, 2025
